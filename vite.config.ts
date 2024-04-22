@@ -6,6 +6,7 @@ export default defineConfig({
     lib: {
       entry: './src/index.ts',
       name: 'screenLog',
+      formats: ['es'],
       fileName: 'index',
     },
   },

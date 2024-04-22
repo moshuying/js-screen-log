@@ -8,7 +8,7 @@
     "debug"
   ],
   "license": "GPL-2.0-only",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "author": {
     "name": "JiuJiang Liu"
   },
@@ -24,7 +24,7 @@
     "node": ">20"
   },
   "type": "module",
-  "main": "dis/index.js",
+  "main": "dist/index.js",
   "types": "src/index.ts",
   "scripts": {
     "dev": "vite --host",
@@ -36,9 +36,9 @@
   "devDependencies": {
     "@types/node": "^20.12.7",
     "typescript": "^5.2.2",
-    "vite": "^5.1.6"
+    "vite": "^5.1.6",
+    "vitest": "^1.5.0"
   },
   "dependencies": {
-    "vitest": "^1.5.0"
   }
 }
