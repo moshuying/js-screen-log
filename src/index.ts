@@ -109,7 +109,7 @@ export class ScreenLog {
     this.render()
   }
   updateScrollTips() {
-    if(this.hideTips) {
+    if (this.hideTips) {
       this.scrollDom.style.display = 'none';
       this.clearButton.style.display = 'none';
       this.dom.style.paddingTop = '0px';
@@ -118,7 +118,7 @@ export class ScreenLog {
     this.scrollDom.innerText = (this.currentView + this.maxCurrentViewLogs) + ' / ' + this.logHistory.length
   }
   _visible = true;
-  get visible(){
+  get visible() {
     return this._visible
   }
   set visible(value: boolean) {
@@ -130,7 +130,7 @@ export class ScreenLog {
     this._visible = value;
   }
   render(viewLogIndex?: number[]) {
-    if(!this.visible){
+    if (!this.visible) {
       this.visible = false;
       return
     }
@@ -168,3 +168,38 @@ export class ScreenLog {
   }
 }
 export default ScreenLog;
+
+/**
+ * 检查数据波动，返回是否有波动和波动位置,使用了四分位数，数据量至少为8
+ * @param data 
+ * @param fluctuation 
+ * @returns 
+ */
+export function checkDataFluctuation(data: number[]): number {
+
+  if(data.length < 8){
+    console.warn('数据量至少为8')
+    return -1
+  }
+
+  // 将数据分为四块，分布计算四块数据的标准差
+  let dataLength = data.length
+  let data1 = data.slice(0, Math.floor(dataLength / 4))
+  let data2 = data.slice(Math.floor(dataLength / 4), Math.floor(dataLength / 2))
+  let data3 = data.slice(Math.floor(dataLength / 2), Math.floor(dataLength * 3 / 4))
+  let data4 = data.slice(Math.floor(dataLength * 3 / 4), dataLength)
+
+  let std1 = Math.sqrt(data1.reduce((acc, cur) => acc + Math.pow(cur - data1.reduce((acc, cur) => acc + cur, 0) / data1.length, 2), 0) / data1.length)
+  let std2 = Math.sqrt(data2.reduce((acc, cur) => acc + Math.pow(cur - data2.reduce((acc, cur) => acc + cur, 0) / data2.length, 2), 0) / data2.length)
+  let std3 = Math.sqrt(data3.reduce((acc, cur) => acc + Math.pow(cur - data3.reduce((acc, cur) => acc + cur, 0) / data3.length, 2), 0) / data3.length)
+  let std4 = Math.sqrt(data4.reduce((acc, cur) => acc + Math.pow(cur - data4.reduce((acc, cur) => acc + cur, 0) / data4.length, 2), 0) / data4.length)
+
+
+  // 找到波动最大的那一块，比较是否超过其他三块的标准差的两倍
+  let stdArray = [std1, std2, std3, std4]
+  let maxStd = Math.max(...stdArray)
+  let maxStdIndex = stdArray.indexOf(maxStd)
+  let stdArrayWithoutMax = stdArray.filter((e, i) => i !== maxStdIndex)
+  let isFluctuation = stdArrayWithoutMax.every(e => maxStd > e * 2)
+  return isFluctuation ? maxStdIndex * dataLength / 4 : -1
+}
