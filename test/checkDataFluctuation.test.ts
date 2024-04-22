@@ -11,7 +11,7 @@ test("检查数据波动", () => {
     9, 13, 14, 15,
     16, 17, 18, 19
   ];
-  expect(checkDataFluctuation(data2)).toBe(9);
+  expect(checkDataFluctuation(data2)).toBe(8);
 
   // 其他情况
   expect(checkDataFluctuation([
@@ -27,7 +27,7 @@ test("检查数据波动", () => {
     40, 40, 40,
     40, 60, 60,
     60, 60, 60
-  ])).toBe(1)
+  ])).toBe(0)
 
   // 波动在两个四分位数之间
   const fluctuationBetweenChunks = [
@@ -36,11 +36,11 @@ test("检查数据波动", () => {
     14, 15, 16, 17, 18,
     19, 20, 21, 22, 23,
   ];
-  expect(checkDataFluctuation(fluctuationBetweenChunks)).toBe(10);
+  expect(checkDataFluctuation(fluctuationBetweenChunks)).toBe(9);
 
   // 超大数据量
   const data3 = Array.from({ length: 1234567 }, (_, i) => i);
   //制造较大的波动
   data3[500] = 0.1;
-  expect(checkDataFluctuation(data3)).toBe(501);
+  expect(checkDataFluctuation(data3)).toBe(500);
 });

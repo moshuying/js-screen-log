@@ -8,7 +8,7 @@
     "debug"
   ],
   "license": "GPL-2.0-only",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "author": {
     "name": "JiuJiang Liu"
   },
@@ -35,10 +35,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
+    "@vitest/coverage-v8": "^1.5.0",
     "typescript": "^5.2.2",
     "vite": "^5.1.6",
     "vitest": "^1.5.0"
-  },
-  "dependencies": {
   }
 }

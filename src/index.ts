@@ -1,16 +1,20 @@
 
 export class ScreenLog {
-  maxCurrentViewLogs = 10;
+  maxCurrentViewLogs = 12;
   dom: HTMLDivElement;
   hideTips = false;
   currentView = this.maxCurrentViewLogs
+  heightLight = true;
+  heighLightCurrentView = true;
   reuseDom = new Array(this.maxCurrentViewLogs).fill(1).map(e => document.createElement('div'))
   scrollDom: HTMLDivElement;
   clearButton: HTMLButtonElement;
   constructor(options = {
-    maxCurrentViewLogs: 10
+    maxCurrentViewLogs: 12,
+    heightLight: true,
+    heighLightCurrentView: true
   }) {
-    this.maxCurrentViewLogs = options.maxCurrentViewLogs;
+    this.maxCurrentViewLogs = options.maxCurrentViewLogs || 12;
     const dom = document.createElement('div');
     this.dom = dom;
     dom.style.position = 'fixed';
@@ -146,6 +150,31 @@ export class ScreenLog {
     }
     this.updateScrollTips()
     this.clearButton.style.left = parseInt(this.dom.style.left) + this.scrollDom.clientWidth + 'px';
+    if (this.heightLight) {
+      this.reuseDom.forEach(e => e.style.backgroundColor = 'transparent');
+      if (this.heighLightCurrentView) {
+        // 取当前视图中的所有数据
+        let data = this.logHistory.slice(this.currentView, this.currentView + this.maxCurrentViewLogs).map(e => parseFloat(e)).filter(e => !isNaN(e));
+        let fluctuationIndex = checkDataFluctuation(data);
+        if (fluctuationIndex !== -1) {
+          this.reuseDom[fluctuationIndex].style.backgroundColor = 'rgba(255,0,0,0.5)';
+        }
+      } else {
+        // 高亮波动数据 rgba(255,0,0,0.5)
+        if (this.logHistory.length > 1) {
+          let data = this.logHistory.map(e => parseFloat(e)).filter(e => !isNaN(e));
+          let fluctuationIndex = checkDataFluctuation(data);
+          if (fluctuationIndex !== -1) {
+            // 计算出当前波动数据在当前视图中的位置
+            let fluctuationViewIndex = fluctuationIndex - this.currentView;
+            // 索引是否在当前视图中
+            if (fluctuationViewIndex >= 0 && fluctuationViewIndex < this.maxCurrentViewLogs) {
+              this.reuseDom[fluctuationViewIndex].style.backgroundColor = 'rgba(255,0,0,0.5)';
+            }
+          }
+        }
+      }
+    }
   }
 
   restoreLogArray: string[] = [];
@@ -170,7 +199,8 @@ export class ScreenLog {
 export default ScreenLog;
 
 /**
- * 检查数据波动，返回是否有波动和波动位置,使用了四分位数，数据量至少为8
+ * 检查数据波动，返回是否有波动和波动位置
+ * 考虑到波动的位置可能在两个四分位数之间，所以分为四分位数和六分位数两种情况
  * @param data 
  * @param fluctuation 
  * @returns 
@@ -196,7 +226,7 @@ export function checkDataFluctuation(data: number[]): number {
     let epslion = 0.0000001;
 
     // 判断整体是否有波动
-    if (Math.abs(maxStd - avgStd) > epslion){
+    if (Math.abs(maxStd - avgStd) > epslion) {
       let fluctuation = stds.indexOf(maxStd);
       let startIndex = fluctuation * sectionLength;
       let endIndex = (fluctuation + 1) * sectionLength;
@@ -205,13 +235,13 @@ export function checkDataFluctuation(data: number[]): number {
       let fluctuationArr = fluctuationData.map((e, i) => fluctuationData[i + 1] - e).slice(0, fluctuationData.length - 1);
       let fluctuationMax = Math.max(...fluctuationArr);
       // 波动区间的变化值
-      let fluctuationIndex = fluctuationArr.indexOf(fluctuationMax) + 1;
+      let fluctuationIndex = fluctuationArr.indexOf(fluctuationMax);
       return fluctuation * sectionLength + fluctuationIndex;
     }
     return -1
   }
   let fourSections = calculateStd(data, 4);
-  if(fourSections !== -1) return fourSections;
+  if (fourSections !== -1) return fourSections;
   let threeSections = calculateStd(data, 6);
   return threeSections;
 }
