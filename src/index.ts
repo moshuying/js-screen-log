@@ -9,12 +9,14 @@ export class ScreenLog {
   reuseDom = new Array(this.maxCurrentViewLogs).fill(1).map(e => document.createElement('div'))
   scrollDom: HTMLDivElement;
   clearButton: HTMLButtonElement;
-  constructor(options = {
-    maxCurrentViewLogs: 12,
-    heightLight: true,
-    heighLightCurrentView: true
+  constructor(options?:{
+    maxCurrentViewLogs?: number,
+    heightLight?: boolean,
+    heighLightCurrentView?: boolean
   }) {
-    this.maxCurrentViewLogs = options.maxCurrentViewLogs || 12;
+    if(options){
+      this.maxCurrentViewLogs = options.maxCurrentViewLogs || 12;
+    }
     const dom = document.createElement('div');
     this.dom = dom;
     dom.style.position = 'fixed';
