@@ -176,30 +176,42 @@ export default ScreenLog;
  * @returns 
  */
 export function checkDataFluctuation(data: number[]): number {
+  function calculateStd(data: number[], numSections: number) {
+    // 将数据分为numSections块，分布计算numSections块数据的标准差
+    let dataLength = data.length;
+    let sectionLength = Math.floor(dataLength / numSections);
+    let sections = Array.from({ length: numSections }, (_, i) => data.slice(i * sectionLength, (i + 1) * sectionLength));
 
-  if(data.length < 8){
-    console.warn('数据量至少为8')
+    // 0表示没有波动
+    let stds = sections.map(section => {
+      let avg = section.reduce((acc, cur) => acc + cur, 0) / section.length;
+      return Math.sqrt(section.reduce((acc, cur) => acc + Math.pow(cur - avg, 2), 0) / section.length);
+    });
+
+    // 最大标准差
+    let maxStd = Math.max(...stds);
+    // 减去最大标准差的平均值
+    let avgStd = (stds.reduce((acc, cur) => acc + cur, 0) - maxStd) / (numSections - 1);
+
+    let epslion = 0.0000001;
+
+    // 判断整体是否有波动
+    if (Math.abs(maxStd - avgStd) > epslion){
+      let fluctuation = stds.indexOf(maxStd);
+      let startIndex = fluctuation * sectionLength;
+      let endIndex = (fluctuation + 1) * sectionLength;
+      // 波动区间数组
+      let fluctuationData = data.slice(startIndex, endIndex);
+      let fluctuationArr = fluctuationData.map((e, i) => fluctuationData[i + 1] - e).slice(0, fluctuationData.length - 1);
+      let fluctuationMax = Math.max(...fluctuationArr);
+      // 波动区间的变化值
+      let fluctuationIndex = fluctuationArr.indexOf(fluctuationMax) + 1;
+      return fluctuation * sectionLength + fluctuationIndex;
+    }
     return -1
   }
-
-  // 将数据分为四块，分布计算四块数据的标准差
-  let dataLength = data.length
-  let data1 = data.slice(0, Math.floor(dataLength / 4))
-  let data2 = data.slice(Math.floor(dataLength / 4), Math.floor(dataLength / 2))
-  let data3 = data.slice(Math.floor(dataLength / 2), Math.floor(dataLength * 3 / 4))
-  let data4 = data.slice(Math.floor(dataLength * 3 / 4), dataLength)
-
-  let std1 = Math.sqrt(data1.reduce((acc, cur) => acc + Math.pow(cur - data1.reduce((acc, cur) => acc + cur, 0) / data1.length, 2), 0) / data1.length)
-  let std2 = Math.sqrt(data2.reduce((acc, cur) => acc + Math.pow(cur - data2.reduce((acc, cur) => acc + cur, 0) / data2.length, 2), 0) / data2.length)
-  let std3 = Math.sqrt(data3.reduce((acc, cur) => acc + Math.pow(cur - data3.reduce((acc, cur) => acc + cur, 0) / data3.length, 2), 0) / data3.length)
-  let std4 = Math.sqrt(data4.reduce((acc, cur) => acc + Math.pow(cur - data4.reduce((acc, cur) => acc + cur, 0) / data4.length, 2), 0) / data4.length)
-
-
-  // 找到波动最大的那一块，比较是否超过其他三块的标准差的两倍
-  let stdArray = [std1, std2, std3, std4]
-  let maxStd = Math.max(...stdArray)
-  let maxStdIndex = stdArray.indexOf(maxStd)
-  let stdArrayWithoutMax = stdArray.filter((e, i) => i !== maxStdIndex)
-  let isFluctuation = stdArrayWithoutMax.every(e => maxStd > e * 2)
-  return isFluctuation ? maxStdIndex * dataLength / 4 : -1
+  let fourSections = calculateStd(data, 4);
+  if(fourSections !== -1) return fourSections;
+  let threeSections = calculateStd(data, 6);
+  return threeSections;
 }
