@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/moshuying/js-screen-log"
+    "url": "git+https://github.com/moshuying/js-screen-log.git"
   },
   "bugs": {
     "url": "https://github.com/moshuying/js-screen-log/issues"
