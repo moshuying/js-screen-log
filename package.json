@@ -1,0 +1,44 @@
+{
+  "name": "js-screen-log",
+  "description": "A simple and lightweight screen log for JavaScript.",
+  "keywords": [
+    "screen",
+    "log",
+    "javascript",
+    "debug"
+  ],
+  "license": "GPL-2.0-only",
+  "version": "0.0.0",
+  "author": {
+    "name": "JiuJiang Liu"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moshuying/js-screen-log"
+  },
+  "bugs": {
+    "url": "https://github.com/moshuying/js-screen-log/issues"
+  },
+  "homepage": "https://msy.plus",
+  "engines": {
+    "node": ">20"
+  },
+  "type": "module",
+  "main": "dis/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.6"
+  },
+  "dependencies": {
+    "vitest": "^1.5.0"
+  }
+}
