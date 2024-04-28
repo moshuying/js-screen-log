@@ -6,6 +6,7 @@ export class ScreenLog {
   currentView = this.maxCurrentViewLogs
   heightLight = true;
   heighLightCurrentView = true;
+
   reuseDom = new Array(this.maxCurrentViewLogs).fill(1).map(e => document.createElement('div'))
   scrollDom: HTMLDivElement;
   clearButton: HTMLButtonElement;
@@ -15,11 +16,12 @@ export class ScreenLog {
     heighLightCurrentView?: boolean
   }) {
     if(options){
-      this.maxCurrentViewLogs = options.maxCurrentViewLogs || 12;
+      this.maxCurrentViewLogs = options.maxCurrentViewLogs || 5;
     }
     const dom = document.createElement('div');
     this.dom = dom;
     dom.style.position = 'fixed';
+    dom.style.zIndex = '10';
     dom.style.top = '5px';
     dom.style.left = '5px';
     dom.style.borderRadius = '5px';
@@ -56,7 +58,7 @@ export class ScreenLog {
     // clear button
     const clearButton = document.createElement('button');
     this.clearButton = clearButton;
-    clearButton.innerText = 'clear(alt + 1) / restore(alt + 2)';
+    clearButton.innerText = 'alt + (1/cls,2/restore,3/clear)';
     clearButton.style.position = 'absolute';
     clearButton.style.textAlign = 'center';
     clearButton.style.top = '2px';
@@ -177,6 +179,12 @@ export class ScreenLog {
         }
       }
     }
+  }
+  hide() {
+    this.visible = false;
+  }
+  show() {
+    this.visible = true;
   }
 
   restoreLogArray: string[] = [];
